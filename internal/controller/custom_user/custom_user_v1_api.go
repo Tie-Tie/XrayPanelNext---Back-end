@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/google/uuid"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
+	"time"
 
 	"gov2panel/api/custom_user/v1"
 )
@@ -82,6 +84,7 @@ func (c *ControllerV1) Knowledge(ctx context.Context, req *v1.KnowledgeReq) (res
 	res.Data, err = service.Knowledge().GetKnowledgeShowList(req.V2Knowledge)
 	return
 }
+
 func (c *ControllerV1) Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.WalletRes, err error) {
 	res = &v1.WalletRes{}
 
@@ -101,6 +104,55 @@ func (c *ControllerV1) Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.W
 	res.CRate = cRate
 	res.User = user
 	res.InviteCount = inviteCount
+
+	return
+}
+
+// TopUp
+//
+//	req.RechargeMethod
+//	0：ERC20充值，1：TRC20充值
+func (c *ControllerV1) TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.TopUpRes, err error) {
+	var user entity.V2User
+
+	if err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user); err != nil {
+		g.RequestFromCtx(ctx).Response.Write(err.Error())
+		return
+	}
+
+	var rechargeName string
+
+	switch req.RechargeMethod {
+	case 0:
+		rechargeName = "ERC20 USDT"
+		break
+	case 1:
+		rechargeName = "TRC20 USDT"
+		break
+	}
+
+	code := service.RechargeRecords().GetCode()
+
+	data := &entity.V2RechargeRecords{
+		Amount:         req.Amount,
+		UserId:         user.Id,
+		OperateType:    1,
+		RechargeName:   rechargeName,
+		RechargeMethod: req.RechargeMethod,
+		TransactionId:  uuid.New().String(),
+		Status:         1,
+		Code:           code,
+	}
+
+	if _, err = g.Model("v2_recharge_records").Insert(data); err != nil {
+		return nil, err
+	}
+
+	res = &v1.TopUpRes{
+		Amount:     req.Amount + float64(code)*0.000001,
+		ExpiryTime: time.Now().Unix(),
+		Success:    true,
+	}
 
 	return
 }

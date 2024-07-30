@@ -32,6 +32,7 @@ type IndexReq struct {
 	g.Meta `path:"/index" tags:"Custom_User" method:"get" summary:"获取用户首页数据"`
 }
 type IndexRes struct {
+	g.Meta          `mime:"text/html" example:"string"`
 	SubscribeDomain string    `json:"subscribe_domain"`
 	UserPageHtml    string    `json:"user_page_html"`
 	PlanInfo        *PlanInfo `json:"plan_info"`
@@ -56,4 +57,16 @@ type WalletRes struct {
 	InviteCount int           `json:"invite_count"`
 	CType       int           `json:"ctype"`
 	CRate       int           `json:"crate"`
+}
+
+type TopUpReq struct {
+	g.Meta         `path:"/topUp" tags:"Wallet" method:"post" summary:"充值"`
+	Amount         float64 `json:"amount"`
+	RechargeMethod int     `json:"recharge_method"`
+}
+type TopUpRes struct {
+	g.Meta     `mime:"text/html" example:"string"`
+	Amount     float64 `json:"code"`
+	ExpiryTime int64   `json:"expiry_time"`
+	Success    bool    `json:"success"`
 }

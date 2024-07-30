@@ -30,8 +30,9 @@ type V2RechargeRecordsColumns struct {
 	TransactionId   string // 订单号 规则看程序注释
 	CreatedAt       string // 创建时间
 	UpdatedAt       string // 更新时间
-	Status          string // 订单状态
+	Status          string // 订单状态：0：失败，1：等待中，2：成功
 	Code            string // 验证码
+	RechargeMethod  string // 充值方式：0：ERC20 USDT 、1：TRC20 USDT
 }
 
 // v2RechargeRecordsColumns holds the columns for table v2_recharge_records.
@@ -48,6 +49,7 @@ var v2RechargeRecordsColumns = V2RechargeRecordsColumns{
 	UpdatedAt:       "updated_at",
 	Status:          "status",
 	Code:            "code",
+	RechargeMethod:  "recharge_method",
 }
 
 // NewV2RechargeRecordsDao creates and returns a new DAO object for table data access.

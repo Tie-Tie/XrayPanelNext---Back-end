@@ -20,6 +20,7 @@ type V2RechargeRecords struct {
 	TransactionId   string      `json:"transaction_id"   orm:"transaction_id"   ` // 订单号 规则看程序注释
 	CreatedAt       *gtime.Time `json:"created_at"       orm:"created_at"       ` // 创建时间
 	UpdatedAt       *gtime.Time `json:"updated_at"       orm:"updated_at"       ` // 更新时间
-	Status          int         `json:"status"           orm:"status"           ` // 订单状态
+	Status          int         `json:"status"           orm:"status"           ` // 订单状态：0：失败，1：等待中，2：成功
 	Code            int         `json:"code"             orm:"code"             ` // 验证码
+	RechargeMethod  int         `json:"recharge_method"  orm:"recharge_method"  ` // 充值方式：0：ERC20 USDT 、1：TRC20 USDT
 }

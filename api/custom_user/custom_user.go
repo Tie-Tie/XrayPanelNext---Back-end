@@ -15,4 +15,5 @@ type ICustomUserV1 interface {
 	Index(ctx context.Context, req *v1.IndexReq) (res *v1.IndexRes, err error)
 	Knowledge(ctx context.Context, req *v1.KnowledgeReq) (res *v1.KnowledgeRes, err error)
 	Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.WalletRes, err error)
+	TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.TopUpRes, err error)
 }

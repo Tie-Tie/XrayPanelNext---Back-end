@@ -20,15 +20,19 @@ type (
 		// couponCode 消费的优惠码，填的优惠码
 		SaveRechargeRecords(data *entity.V2RechargeRecords, payCode string, val float64, id int, couponCode string) (err error)
 		// 获取数据
-		GetRechargeRecordsList(req *v1.RechargeRecordsReq, orderBy, orderDirection string, offset, limit int) (m []*model.RechargeRecordsInfo, total int, err error)
+		GetRechargeRecordsList(req *v1.RechargeRecordsReq, orderBy string, orderDirection string, offset int, limit int) (m []*model.RechargeRecordsInfo, total int, err error)
 		// 获取数据根据用户id
-		GetRechargeRecordsListByUserId(userId int, orderBy, orderDirection string, offset, limit int) (m []*entity.V2RechargeRecords, total int, err error)
+		GetRechargeRecordsListByUserId(userId int, orderBy string, orderDirection string, offset int, limit int) (m []*entity.V2RechargeRecords, total int, err error)
 		// 更新备注
 		UpRechargeRecordsRemarksById(id int, remarks string) (err error)
 		// 获取当月收入
 		GetNowMonthSumAmount() (amount float64, err error)
 		// 获取当月每一天的收入
 		GetNowMonthDaySum() (data []int, err error)
+		// GetCode 获取未被使用过的码
+		GetCode() int
+		// IsOrderExpired 验证订单是否超时，验证订单是否到账
+		IsOrderExpired(rangeTime int)
 	}
 )
 

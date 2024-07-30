@@ -22,6 +22,7 @@ type V2RechargeRecords struct {
 	TransactionId   interface{} // 订单号 规则看程序注释
 	CreatedAt       *gtime.Time // 创建时间
 	UpdatedAt       *gtime.Time // 更新时间
-	Status          interface{} // 订单状态
+	Status          interface{} // 订单状态：0：失败，1：等待中，2：成功
 	Code            interface{} // 验证码
+	RechargeMethod  interface{} // 充值方式：0：ERC20 USDT 、1：TRC20 USDT
 }

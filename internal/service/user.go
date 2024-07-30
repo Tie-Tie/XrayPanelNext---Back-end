@@ -25,13 +25,13 @@ type (
 		// 计算用户佣金
 		// 用户
 		// 金额
-		CalculateUserCommission(CType, CRate int, fromUserId int, val float64) (commission float64, err error)
+		CalculateUserCommission(CType int, CRate int, fromUserId int, val float64) (commission float64, err error)
 		// 更新
 		UpUser(data *entity.V2User) (err error)
 		// 更新过期用户的权限组和流量
 		ClearExpiredUserGroupIdAndUDTransferEnable() (err error)
 		// 用户注册
-		RegisterUser(UserName, Passwd, CommissionCode string) error
+		RegisterUser(UserName string, Passwd string, CommissionCode string) error
 		// 添加用户
 		AddUser(user *entity.V2User) error
 		// 删除
@@ -59,9 +59,9 @@ type (
 		// 更新用户 7天流量使用数据
 		UpUserDay7Flow(data []*model.UserTraffic) (err error)
 		// 用户登录
-		Login(userName, passwd string) (user *entity.V2User, err error)
+		Login(userName string, passwd string) (user *entity.V2User, err error)
 		// 获取用户数据
-		GetUserList(req *v1.UserReq, orderBy, orderDirection string, offset, limit int) (items []*model.UserInfo, total int, err error)
+		GetUserList(req *v1.UserReq, orderBy string, orderDirection string, offset int, limit int) (items []*model.UserInfo, total int, err error)
 		// 修改密码
 		UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error)
 		// 获取当月注册量

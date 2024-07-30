@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"io"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -111,4 +114,32 @@ func CheckStr(str string) bool {
 		return true
 	}
 	return false
+}
+
+// ApiGet 自己封装的 GET 请求函数
+func ApiGet(baseURL string, params url.Values) ([]byte, error) {
+	Url, _ := url.Parse(baseURL)
+
+	Url.RawQuery = params.Encode()
+
+	resp, _ := http.Get(Url.String())
+
+	// 发送 GET 请求
+	resp, err := http.Get(Url.String())
+	if err != nil {
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
