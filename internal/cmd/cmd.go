@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"context"
-
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gview"
+	"gov2panel/internal/controller/custom_public"
+	"gov2panel/internal/controller/custom_user"
 
 	"gov2panel/internal/controller/admin"
 	"gov2panel/internal/controller/public"
@@ -69,7 +70,6 @@ var (
 					group.Bind(
 						server_api.NewV1(),
 					)
-
 				})
 
 				group.Group("/"+adminiPath.String(), func(group *ghttp.RouterGroup) {
@@ -77,7 +77,6 @@ var (
 					group.Bind(
 						admin.NewV1(),
 					)
-
 				})
 
 				group.Group("/user", func(group *ghttp.RouterGroup) {
@@ -85,9 +84,22 @@ var (
 					group.Bind(
 						user_c.NewV1(),
 					)
-
 				})
 
+				// 添加自定义api接口，public不会验证token
+				group.Group("/custom_public", func(group *ghttp.RouterGroup) {
+					group.Bind(
+						custom_public.NewV1(),
+					)
+				})
+
+				// 添加自定义api接口，user会验证是否身份为用户
+				group.Group("/custom_user", func(group *ghttp.RouterGroup) {
+					group.Middleware(user.Middleware().AuthUser) //权限处理
+					group.Bind(
+						custom_user.NewV1(),
+					)
+				})
 			})
 
 			//每天6点执行  更新过期用户的权限组和流量

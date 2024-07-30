@@ -1,12 +1,12 @@
 // =================================================================================
-// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT. 
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
 // =================================================================================
 
 package user
 
 import (
 	"context"
-	
+
 	"gov2panel/api/user/v1"
 )
 
@@ -42,5 +42,3 @@ type IUserV1 interface {
 	CommissionTransferBalance(ctx context.Context, req *v1.CommissionTransferBalanceReq) (res *v1.CommissionTransferBalanceRes, err error)
 	CWithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error)
 }
-
-

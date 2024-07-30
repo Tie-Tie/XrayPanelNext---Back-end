@@ -1,12 +1,12 @@
 // =================================================================================
-// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT. 
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
 // =================================================================================
 
 package admin
 
 import (
 	"context"
-	
+
 	"gov2panel/api/admin/v1"
 )
 
@@ -60,5 +60,3 @@ type IAdminV1 interface {
 	Refresh(ctx context.Context, req *v1.RefreshReq) (res *v1.RefreshRes, err error)
 	ResetTokenAndUuid(ctx context.Context, req *v1.ResetTokenAndUuidReq) (res *v1.ResetTokenAndUuidRes, err error)
 }
-
-

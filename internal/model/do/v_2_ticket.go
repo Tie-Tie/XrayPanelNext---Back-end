@@ -16,8 +16,8 @@ type V2Ticket struct {
 	UserId      interface{} //
 	Subject     interface{} //
 	Level       interface{} // 1低 2中 3高
-	Status      interface{} // -1:已开启 1:已关闭
-	ReplyStatus interface{} // -1:待回复 1:已回复
+	Status      interface{} // 0:已开启 1:已关闭
+	ReplyStatus interface{} // 0:待回复 1:已回复
 	CreatedAt   *gtime.Time //
 	UpdatedAt   *gtime.Time //
 }

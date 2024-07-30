@@ -20,6 +20,8 @@ type V2RechargeRecords struct {
 	ConsumptionName interface{} // 消费类型 operate_type=2才有
 	Remarks         interface{} // 备注
 	TransactionId   interface{} // 订单号 规则看程序注释
-	CreatedAt       *gtime.Time //
-	UpdatedAt       *gtime.Time //
+	CreatedAt       *gtime.Time // 创建时间
+	UpdatedAt       *gtime.Time // 更新时间
+	Status          interface{} // 订单状态
+	Code            interface{} // 验证码
 }
