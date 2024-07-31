@@ -2,16 +2,15 @@ package recharge_records
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/util/gconv"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/dao"
 	d "gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
+	"gov2panel/internal/type/transaction"
 	"gov2panel/internal/utils"
-	"math"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -313,64 +312,46 @@ func (s *sRechargeRecords) GetCode() int {
 	}()
 }
 
-// IsOrderExpired 验证订单是否超时，验证订单是否到账
-func (s *sRechargeRecords) IsOrderExpired(rangeTime int) {
+// TransactionVerify 验证订单是否超时，验证订单是否到账
+func (s *sRechargeRecords) TransactionVerify(rangeTime int, deadline int64) {
+	ctx := context.TODO()
 	var err error
 
-	// ----------------------------------------------------------------------------------------
-
-	// ----------------------------------------------------------------------------------------
-
 	for range time.Tick(time.Second * time.Duration(rangeTime)) {
-		unfinished, _ := g.Model(s.Cornerstone.Table).Fields("code", "amount", "recharge_method", "id").All("status=", 1)
+		unfinished, _ := g.Model(s.Cornerstone.Table).Fields("user_id", "code", "amount", "recharge_method", "id", "created_at").All("status=", 1)
 
-		var result []byte
-
-		if result, err = utils.ApiGet("https://api-sepolia.etherscan.io/api", url.Values{
-			"module":     {"account"},
-			"action":     {"txlist"},
-			"address":    {"0xA95C5F0fe1096449D8e93E9AE7ce7A66Ac71Cdb2"},
-			"startblock": {"0"},
-			"endblock":   {"99999999"},
-			"page":       {"1"},
-			"offset":     {"1000"},
-			"sort":       {"desc"},
-			"apikey":     {"DEIYQVETP9XBYYG52PA4NBPJGXXNUNWGWC"},
-		}); err != nil {
-			g.Log("ERROR", "ERP20 USDT：交易列表请求失败！")
-			//continue
+		// Eth 交易列表API请求
+		var ethRes transaction.EthRes
+		if ethRes, err = EthApiGet(ctx, "0xA95C5F0fe1096449D8e93E9AE7ce7A66Ac71Cdb2"); err != nil {
+			continue
 		}
 
-		var erc20Res utils.Erc20Res
-		if err = json.Unmarshal(result, &erc20Res); err != nil {
-			g.Log("ERROR", "ERP20 USDT：请求转换json失败！")
-			//continue
+		// ERC20 交易数据请求
+		var erc20Res transaction.Erc20Res
+		if erc20Res, err = Erc20ApiGet(ctx, "0xdAC17F958D2ee523a2206206994597C13D831ec7", "0xA95C5F0fe1096449D8e93E9AE7ce7A66Ac71Cdb2"); err != nil {
+			continue
+		}
+
+		// TRC20 交易列表API请求
+		var trc20Res transaction.Trc20Res
+		if trc20Res, err = Trc20ApiGet(ctx, "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", "TUgnvQq6n4YxFK1stP8chRwHdMHUfd24zt"); err != nil {
+			continue
 		}
 
 		// 循环交易中的订单
-		for _, order := range unfinished {
-			// 循环查询到的订单
-			for _, _row := range erc20Res.Result {
-				// 转换金额
-				math.Pow(10, -18)
-				_row
-
-				// 验证交易金额
-				// continue
-
-				// 验证交易时间
-				// continue
-
-				// 修改订单交易状态并将金额充值进入到用户账户中
-				// continue
-				err =
+		for _, _order := range unfinished {
+			// 根据订单类型循环查询到的订单
+			switch gconv.Int(_order["recharge_method"]) {
+			case 0:
+				Erc20Verify(ctx, erc20Res, _order, deadline)
+				break
+			case 1:
+				Trc20Verify(ctx, trc20Res, _order, deadline)
+				break
+			case 3:
+				EthVerify(ctx, ethRes, _order, deadline)
+				break
 			}
-
-
 		}
-
-		//for _, record := range unfinished {
-		//	g.Dump(record)
-		//}
 	}
 }

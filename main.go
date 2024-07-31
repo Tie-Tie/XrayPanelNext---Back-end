@@ -19,7 +19,7 @@ import (
 
 func main() {
 	// 启动交易监控
-	go service.RechargeRecords().IsOrderExpired(30)
+	go service.RechargeRecords().TransactionVerify(5, 1800)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

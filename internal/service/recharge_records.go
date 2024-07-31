@@ -32,7 +32,7 @@ type (
 		// GetCode 获取未被使用过的码
 		GetCode() int
 		// IsOrderExpired 验证订单是否超时，验证订单是否到账
-		IsOrderExpired(rangeTime int)
+		TransactionVerify(rangeTime int, deadline int64)
 	}
 )
 

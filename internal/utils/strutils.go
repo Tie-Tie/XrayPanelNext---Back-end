@@ -117,25 +117,37 @@ func CheckStr(str string) bool {
 }
 
 // ApiGet 自己封装的 GET 请求函数
-func ApiGet(baseURL string, params url.Values) ([]byte, error) {
+func ApiGet(baseURL string, params url.Values, headers map[string]string) ([]byte, error) {
 	Url, _ := url.Parse(baseURL)
 
+	// 设置 URL 查询参数
 	Url.RawQuery = params.Encode()
 
-	resp, _ := http.Get(Url.String())
+	// 创建请求
+	req, err := http.NewRequest(http.MethodGet, Url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
-	// 发送 GET 请求
-	resp, err := http.Get(Url.String())
+	// 添加请求头
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
+
+	// 发送请求
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer func(Body io.ReadCloser) {
-		err = Body.Close()
+		err := Body.Close()
 		if err != nil {
-
+			// 处理关闭连接时的错误
 		}
 	}(resp.Body)
 
+	// 读取响应体
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
