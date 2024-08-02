@@ -12,4 +12,5 @@ import (
 
 type ICustomPublicV1 interface {
 	Plan(ctx context.Context, req *v1.PlanReq) (res *v1.PlanRes, err error)
+	Setting(ctx context.Context, req *v1.SettingReq) (res *v1.SettingRes, err error)
 }

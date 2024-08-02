@@ -19,3 +19,15 @@ func (c *ControllerV1) Plan(ctx context.Context, req *v1.PlanReq) (res *v1.PlanR
 	}
 	return
 }
+func (c *ControllerV1) Setting(ctx context.Context, req *v1.SettingReq) (res *v1.SettingRes, err error) {
+	setting, err := service.Setting().GetSettingAllMap()
+	if err != nil {
+		return nil, err
+	}
+
+	res = &v1.SettingRes{
+		Config: setting[req.ConfigName].String(),
+	}
+
+	return
+}

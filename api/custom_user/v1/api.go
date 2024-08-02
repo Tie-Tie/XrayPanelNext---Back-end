@@ -66,7 +66,7 @@ type TopUpReq struct {
 }
 type TopUpRes struct {
 	g.Meta     `mime:"text/html" example:"string"`
-	Amount     float64 `json:"code"`
+	Amount     float64 `json:"amount"`
 	ExpiryTime int64   `json:"expiry_time"`
 	Success    bool    `json:"success"`
 }

@@ -1,12 +1,17 @@
 package utils
 
 import (
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"fmt"
+	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -154,4 +159,38 @@ func ApiGet(baseURL string, params url.Values, headers map[string]string) ([]byt
 	}
 
 	return body, nil
+}
+
+// RoundToFixed rounds a float64 to the specified number of decimal places.
+func RoundToFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return math.Round(num*output) / output
+}
+
+// ConvertToTimestamp 时间戳转化、验证时间是否超时
+func ConvertToTimestamp(ctx context.Context, _order gdb.Record, deadline int64) int64 {
+	// 转化时间戳
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		g.Log().Debug(ctx, "Trc20：加载时区失败")
+		return 0
+	}
+
+	t, err := time.ParseInLocation("2006-01-02 15:04:05", gconv.String(_order["created_at"]), loc)
+	if err != nil {
+		g.Log().Debug(ctx, "Trc20：时间本地化失败")
+		return 0
+	}
+	beginTimestamp := t.Unix()
+
+	// 验证订单是否超时
+	if beginTimestamp+deadline < time.Now().Unix() {
+		_, err = g.Model("v2_recharge_records").Where("id=", _order["id"]).Update(g.Map{
+			"status": 0,
+		})
+		g.Log().Debug(ctx, "Trc20：这笔交易已经超时了！")
+		return -1
+	}
+
+	return beginTimestamp
 }

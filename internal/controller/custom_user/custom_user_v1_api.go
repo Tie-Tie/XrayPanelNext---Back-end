@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/google/uuid"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
+	"gov2panel/internal/utils"
 	"time"
 
 	"gov2panel/api/custom_user/v1"
@@ -42,7 +44,6 @@ func (c *ControllerV1) Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes,
 }
 
 func (c *ControllerV1) Index(ctx context.Context, req *v1.IndexReq) (res *v1.IndexRes, err error) {
-	g.Dump(666)
 	var user entity.V2User
 	var setting map[string]*g.Var
 	var plan *entity.V2Plan
@@ -111,7 +112,7 @@ func (c *ControllerV1) Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.W
 // TopUp
 //
 //	req.RechargeMethod
-//	0：ERC20充值，1：TRC20充值
+//	0：ERC20充值，1：TRC20充值,2：ETH充值，3：TRX充值
 func (c *ControllerV1) TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.TopUpRes, err error) {
 	var user entity.V2User
 
@@ -125,13 +126,17 @@ func (c *ControllerV1) TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.Top
 	switch req.RechargeMethod {
 	case 0:
 		rechargeName = "ERC20 USDT"
-		break
 	case 1:
 		rechargeName = "TRC20 USDT"
-		break
+	case 2:
+		rechargeName = "Ethereum (ETH)"
+	case 3:
+		rechargeName = "TRX (TRON)"
 	}
 
 	code := service.RechargeRecords().GetCode()
+
+	timeNow := time.Now().Unix()
 
 	data := &entity.V2RechargeRecords{
 		Amount:         req.Amount,
@@ -142,6 +147,7 @@ func (c *ControllerV1) TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.Top
 		TransactionId:  uuid.New().String(),
 		Status:         1,
 		Code:           code,
+		CreatedAt:      gconv.GTime(timeNow),
 	}
 
 	if _, err = g.Model("v2_recharge_records").Insert(data); err != nil {
@@ -149,8 +155,8 @@ func (c *ControllerV1) TopUp(ctx context.Context, req *v1.TopUpReq) (res *v1.Top
 	}
 
 	res = &v1.TopUpRes{
-		Amount:     req.Amount + float64(code)*0.000001,
-		ExpiryTime: time.Now().Unix(),
+		Amount:     utils.RoundToFixed(req.Amount+float64(code)*0.000001, 6),
+		ExpiryTime: timeNow + 30*60,
 		Success:    true,
 	}
 

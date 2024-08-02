@@ -34,18 +34,18 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 
 	switch req.Flag {
 
-	case "1": //v2rayn
+	case "v2rayN": //v2rayn
 		result = V2rayNSub(serviceArr, user)
-	case "2": //v2rayng
+	case "v2rayNG": //v2rayng
 		result = V2rayNGSub(serviceArr, user)
-	case "3": //shadowrocket
+	case "Shadowrocket": //shadowrocket
 		result = ShadowrocketSub(serviceArr, user)
-	case "4": //clash
+	case "Clash": //clash
 		result = ClashSub(serviceArr, user)
 		ghttp.RequestFromCtx(ctx).Response.WriteExit([]byte(result))
-	case "5": //shadowsocks
+	case "Shadowsocks": //shadowsocks
 		result = ShadowsocksSub(serviceArr, user)
-	case "6": //nekobox
+	case "NekoBox": //nekobox
 		result = NekoBoxSub(serviceArr, user)
 	default:
 		result = V2rayNSub(serviceArr, user)

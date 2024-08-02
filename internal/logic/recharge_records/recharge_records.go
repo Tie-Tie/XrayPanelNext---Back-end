@@ -9,7 +9,6 @@ import (
 	"gov2panel/internal/dao"
 	d "gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
-	"gov2panel/internal/type/transaction"
 	"gov2panel/internal/utils"
 	"strconv"
 	"time"
@@ -89,6 +88,7 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 				return err
 			}
 		}
+		data.Status = 2
 
 		rechargeRecordsId, err := tx.Ctx(ctx).InsertAndGetId(d.V2RechargeRecords.Table(), data)
 		if err != nil {
@@ -315,42 +315,62 @@ func (s *sRechargeRecords) GetCode() int {
 // TransactionVerify 验证订单是否超时，验证订单是否到账
 func (s *sRechargeRecords) TransactionVerify(rangeTime int, deadline int64) {
 	ctx := context.TODO()
-	var err error
 
 	for range time.Tick(time.Second * time.Duration(rangeTime)) {
 		unfinished, _ := g.Model(s.Cornerstone.Table).Fields("user_id", "code", "amount", "recharge_method", "id", "created_at").All("status=", 1)
 
-		// Eth 交易列表API请求
-		var ethRes transaction.EthRes
-		if ethRes, err = EthApiGet(ctx, "0xA95C5F0fe1096449D8e93E9AE7ce7A66Ac71Cdb2"); err != nil {
+		setting, err := service.Setting().GetSettingAllMap()
+		if err != nil {
+			g.Log().Error(ctx, "交易流程获取钱包配置项目错误！")
+		}
+
+		// 如果没有需要验证的交易，那么直接进行下一次循环
+		if len(unfinished) == 0 {
 			continue
 		}
 
 		// ERC20 交易数据请求
-		var erc20Res transaction.Erc20Res
-		if erc20Res, err = Erc20ApiGet(ctx, "0xdAC17F958D2ee523a2206206994597C13D831ec7", "0xA95C5F0fe1096449D8e93E9AE7ce7A66Ac71Cdb2"); err != nil {
-			continue
-		}
+		erc20Res := Erc20ApiGet(ctx, "0xdAC17F958D2ee523a2206206994597C13D831ec7", setting["erc20_wallet_address"].String())
 
-		// TRC20 交易列表API请求
-		var trc20Res transaction.Trc20Res
-		if trc20Res, err = Trc20ApiGet(ctx, "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", "TUgnvQq6n4YxFK1stP8chRwHdMHUfd24zt"); err != nil {
-			continue
-		}
+		// TRC20 交易数据请求
+		trc20Res := Trc20ApiGet(ctx, "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", setting["trc20_wallet_address"].String())
+
+		// 暂时不开启
+		//// Eth 交易数据请求
+		//ethRes := EthApiGet(ctx, setting["eth_wallet_address"].String())
+		//
+		//// TRX 交易数据请求
+		//trxRes := TrxApiGet(ctx, setting["trx_wallet_address"].String())
 
 		// 循环交易中的订单
 		for _, _order := range unfinished {
+
+			// 生成订单时间戳并验证是否超时
+			beginTimestamp := utils.ConvertToTimestamp(ctx, _order, deadline)
+			if beginTimestamp == 0 {
+				continue
+			} else if beginTimestamp == -1 {
+				break
+			}
+
 			// 根据订单类型循环查询到的订单
 			switch gconv.Int(_order["recharge_method"]) {
 			case 0:
-				Erc20Verify(ctx, erc20Res, _order, deadline)
-				break
+				if len(erc20Res.Result) > 0 {
+					Erc20Verify(ctx, erc20Res, _order, beginTimestamp)
+				}
 			case 1:
-				Trc20Verify(ctx, trc20Res, _order, deadline)
-				break
-			case 3:
-				EthVerify(ctx, ethRes, _order, deadline)
-				break
+				if len(trc20Res.Data) > 0 {
+					Trc20Verify(ctx, trc20Res, _order, beginTimestamp)
+				}
+				//case 2:
+				//	if len(ethRes.Result) > 0 {
+				//		EthVerify(ctx, ethRes, _order, beginTimestamp)
+				//	}
+				//case 3:
+				//	if len(trxRes.Data) > 0 {
+				//		TrxVerify(ctx, trxRes, _order, beginTimestamp)
+				//	}
 			}
 		}
 	}

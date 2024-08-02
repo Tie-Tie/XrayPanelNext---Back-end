@@ -12,3 +12,12 @@ type PlanRes struct {
 	g.Meta `mime:"application/json" example:"string"`
 	Data   []*entity.V2Plan `json:"data"`
 }
+
+type SettingReq struct {
+	g.Meta     `path:"/setting" tags:"Wallet" method:"get" summary:"充值"`
+	ConfigName string `json:"config_name"`
+}
+type SettingRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+	Config string `json:"config"`
+}
