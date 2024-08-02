@@ -1,0 +1,23 @@
+server:
+  serverRoot: "resource/public"
+  address:     ":8080" # 启动端口
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
+
+logger:
+  level : "all"
+  stdout: true
+database:
+  default:
+    link: "mysql:root:DCCF149D-2F9D-6068-65C4-4B1CF8DD5D88@tcp(172.28.1.2:3306)/xray_panel_next?loc=Local&parseTime=true&charset=utf8mb4"
+    # link: "mysql:root:admin@tcp(127.0.0.1:3306)/gov2panel?loc=Local&parseTime=true&charset=utf8mb4"
+    debug: true
+  
+viewer:
+    Paths : ["resource/template"] # 模板文件搜索目录路径，建议使用绝对路径。默认为当前程序工作路径
+    DefaultFile : "index.html"          # 默认解析的模板引擎文件。默认为"index.html"
+    Delimiters : ["{{", "}}"]          # 模板引擎变量分隔符号。默认为 ["{{", "}}"]
+    AutoEncode : false                 # 是否默认对变量内容进行XSS编码。默认为false
+
+jwtkey: "gov2panel" #jwt key 随机填写
+admini_path: "admin" #后台登录地址
