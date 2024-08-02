@@ -173,13 +173,13 @@ func ConvertToTimestamp(ctx context.Context, _order gdb.Record, deadline int64) 
 	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
 		g.Log().Debug(ctx, "Trc20：加载时区失败")
-		return 0
+		return -1
 	}
 
 	t, err := time.ParseInLocation("2006-01-02 15:04:05", gconv.String(_order["created_at"]), loc)
 	if err != nil {
 		g.Log().Debug(ctx, "Trc20：时间本地化失败")
-		return 0
+		return -1
 	}
 	beginTimestamp := t.Unix()
 
@@ -189,7 +189,7 @@ func ConvertToTimestamp(ctx context.Context, _order gdb.Record, deadline int64) 
 			"status": 0,
 		})
 		g.Log().Debug(ctx, "Trc20：这笔交易已经超时了！")
-		return -1
+		return 0
 	}
 
 	return beginTimestamp

@@ -334,7 +334,7 @@ func (s *sRechargeRecords) TransactionVerify(rangeTime int, deadline int64) {
 
 		setting, err := service.Setting().GetSettingAllMap()
 		if err != nil {
-			g.Log().Error(ctx, "交易流程获取钱包配置项目错误！")
+			g.Log().Error(ctx, "交易流程：获取钱包配置项目错误！")
 		}
 
 		// ERC20 交易数据请求
