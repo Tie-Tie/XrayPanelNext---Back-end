@@ -10,7 +10,7 @@ logger:
 database:
   default:
     link: "mysql:root:DCCF149D-2F9D-6068-65C4-4B1CF8DD5D88@tcp(172.28.1.2:3306)/xray_panel_next?loc=Local&parseTime=true&charset=utf8mb4"
-    # link: "mysql:root:admin@tcp(127.0.0.1:3306)/gov2panel?loc=Local&parseTime=true&charset=utf8mb4"
+#     link: "mysql:root:admin@tcp(127.0.0.1:3306)/gov2panel?loc=Local&parseTime=true&charset=utf8mb4"
     debug: true
   
 viewer:

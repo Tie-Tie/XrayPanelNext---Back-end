@@ -315,18 +315,26 @@ func (s *sRechargeRecords) GetCode() int {
 // TransactionVerify 验证订单是否超时，验证订单是否到账
 func (s *sRechargeRecords) TransactionVerify(rangeTime int, deadline int64) {
 	ctx := context.TODO()
+	g.Log().Info(ctx, "交易检测服务已经开启！")
+
+	// 计数器变量
+	var count = 1
 
 	for range time.Tick(time.Second * time.Duration(rangeTime)) {
+		g.Log().Info(ctx, "第"+gconv.String(count)+"次交易检测开始！")
+		count += 1
+
 		unfinished, _ := g.Model(s.Cornerstone.Table).Fields("user_id", "code", "amount", "recharge_method", "id", "created_at").All("status=", 1)
+
+		// 如果没有需要验证的交易，那么直接进行下一次循环
+		if len(unfinished) == 0 {
+			g.Log().Info(ctx, "当前没有新的交易数据，自动跳过本次交易验证！")
+			continue
+		}
 
 		setting, err := service.Setting().GetSettingAllMap()
 		if err != nil {
 			g.Log().Error(ctx, "交易流程获取钱包配置项目错误！")
-		}
-
-		// 如果没有需要验证的交易，那么直接进行下一次循环
-		if len(unfinished) == 0 {
-			continue
 		}
 
 		// ERC20 交易数据请求

@@ -31,7 +31,7 @@ func Erc20ApiGet(ctx context.Context, contractAddress string, walletAddress stri
 		"sort":            {"desc"},
 		"apikey":          {"DEIYQVETP9XBYYG52PA4NBPJGXXNUNWGWC"},
 	}, g.MapStrStr{}); err != nil {
-		g.Log().Error(ctx, "Erc20：交易列表请求失败！")
+		g.Log().Error(ctx, "Erc20：交易列表请求失败！"+err.Error())
 		return
 	}
 
