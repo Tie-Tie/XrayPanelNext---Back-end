@@ -18,11 +18,6 @@ import (
 )
 
 func main() {
-	setting, _ := service.Setting().GetSettingAllMap()
-
-	// 启动交易监控
-	go service.RechargeRecords().TransactionVerify(setting["verification_interval"].Int(), setting["verification_deadline"].Int64())
-
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -31,6 +26,10 @@ func main() {
 		service.User().MSaveAllRam()
 		os.Exit(0)
 	}()
+
+	// 启动交易监控
+	setting, _ := service.Setting().GetSettingAllMap()
+	go service.RechargeRecords().TransactionVerify(setting["verification_interval"].Int(), setting["verification_deadline"].Int64())
 
 	cmd.Main.Run(gctx.GetInitCtx())
 }
