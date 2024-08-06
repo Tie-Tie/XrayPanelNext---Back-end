@@ -48,13 +48,9 @@ var (
 				})
 
 				group.Middleware(ghttp.MiddlewareHandlerResponse) //处理处理程序响应对象及其错误的默认中间件
-
-				group.Group("/api", func(group *ghttp.RouterGroup) {
-					group.Bind(
-						public.NewV1(),
-					)
-				})
-
+				group.Bind(
+					public.NewV1(),
+				)
 				group.Middleware(user.Middleware().CORS) //跨域处理
 
 				group.Group("/api/server", func(group *ghttp.RouterGroup) {
@@ -76,14 +72,14 @@ var (
 					)
 				})
 
-				group.Group("/api"+adminiPath.String(), func(group *ghttp.RouterGroup) {
+				group.Group("/"+adminiPath.String(), func(group *ghttp.RouterGroup) {
 					group.Middleware(user.Middleware().AuthAdmin) //权限处理
 					group.Bind(
 						admin.NewV1(),
 					)
 				})
 
-				group.Group("/api/user", func(group *ghttp.RouterGroup) {
+				group.Group("/user", func(group *ghttp.RouterGroup) {
 					group.Middleware(user.Middleware().AuthUser) //权限处理
 					group.Bind(
 						user_c.NewV1(),
@@ -91,14 +87,14 @@ var (
 				})
 
 				// 添加自定义api接口，public不会验证token
-				group.Group("/api/custom_public", func(group *ghttp.RouterGroup) {
+				group.Group("/custom_public", func(group *ghttp.RouterGroup) {
 					group.Bind(
 						custom_public.NewV1(),
 					)
 				})
 
 				// 添加自定义api接口，user会验证是否身份为用户
-				group.Group("/api/custom_user", func(group *ghttp.RouterGroup) {
+				group.Group("/custom_user", func(group *ghttp.RouterGroup) {
 					group.Middleware(user.Middleware().AuthUser) //权限处理
 					group.Bind(
 						custom_user.NewV1(),
